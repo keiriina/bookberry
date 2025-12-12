@@ -19,4 +19,9 @@ export default defineSchema({
     })
         .index("by_google_id", ["id"])
         .index("by_user_id", ["userId"]),
+    users: defineTable({
+        userId: v.string(), // Clerk ID
+        readingGoal: v.number(),
+        username: v.optional(v.string()), // Optional custom username
+    }).index("by_user_id", ["userId"]),
 });

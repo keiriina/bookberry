@@ -10,6 +10,7 @@
 
 import type * as books from "../books.js";
 import type * as shelf from "../shelf.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +21,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   books: typeof books;
   shelf: typeof shelf;
+  users: typeof users;
 }>;
 
 /**
