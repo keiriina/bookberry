@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
 import { BookOpen, User } from 'lucide-react';
+import { UserButton } from "@clerk/nextjs";
 import { StrawberryLogo } from './ui/StrawberryLogo';
 
 export function Navbar() {
@@ -39,8 +40,9 @@ export function Navbar() {
                 <div className="flex items-center gap-2">
                     <NavItem href="/" icon={BookOpen} label="Discover" />
                     <NavItem href="/profile" icon={User} label="My Shelf" />
+                    <UserButton afterSignOutUrl="/" />
                 </div>
             </div>
-        </nav>
+        </nav >
     );
 }

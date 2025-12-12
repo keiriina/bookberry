@@ -1,7 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import { UserBook, Book, ReadingStatus } from '@/lib/types';
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
+
 interface BookberryContextType {
     library: UserBook[];
     addBook: (book: Book, status?: ReadingStatus) => void;
@@ -15,63 +18,58 @@ interface BookberryContextType {
 const BookberryContext = createContext<BookberryContextType | undefined>(undefined);
 
 export function BookberryProvider({ children }: { children: React.ReactNode }) {
-    const [library, setLibrary] = useState<UserBook[]>([]);
+    // Convex Hooks
+    const libraryRaw = useQuery(api.books.get);
+    const addBookMutation = useMutation(api.books.add);
+    const updateStatusMutation = useMutation(api.books.updateStatus);
+    const updateProgressMutation = useMutation(api.books.updateProgress);
+    const rateBookMutation = useMutation(api.books.rate);
+    const removeBookMutation = useMutation(api.books.remove);
+    const clearLibraryMutation = useMutation(api.books.clear);
 
-    useEffect(() => {
-        // Load from local storage
-        const saved = localStorage.getItem('bookberry_library');
-        if (saved) {
-            setLibrary(JSON.parse(saved));
-        }
-    }, []);
-
-    useEffect(() => {
-        if (library.length > 0) {
-            localStorage.setItem('bookberry_library', JSON.stringify(library));
-        } else {
-            // Check if we previously had data; if library is empty we might want to clear LS too
-            // to avoid sync issues if we reload.
-            if (localStorage.getItem('bookberry_library')) {
-                localStorage.removeItem('bookberry_library');
-            }
-        }
-    }, [library]);
+    // Transform library data if needed, or default to empty array while loading
+    const library: UserBook[] = (libraryRaw || []).map((book: any) => ({
+        ...book,
+        // Ensure status is cast correctly if needed
+        status: book.status as ReadingStatus
+    }));
 
     const addBook = (book: Book, status: ReadingStatus = 'WANT_TO_READ') => {
-        if (library.find(b => b.id === book.id)) return;
-        const newBook: UserBook = {
-            ...book,
+        // Prevent adding if already in library
+        // Note: mutation inside has check, but good to check here or rely on UI to disable button
+        // The BookCard logic might check 'library' prop.
+        // For optimistically updates or just relying on Convex:
+
+        addBookMutation({
+            id: book.id, // Google Books ID
+            title: book.title,
+            authors: book.authors,
+            description: book.description,
+            coverUrl: book.coverUrl,
+            pageCount: book.pageCount,
+            isbn: book.isbn,
             status,
-            addedAt: new Date().toISOString()
-        };
-        setLibrary(prev => [...prev, newBook]);
+        });
     };
 
     const updateBookStatus = (id: string, status: ReadingStatus) => {
-        setLibrary(prev => prev.map(book =>
-            book.id === id ? { ...book, status } : book
-        ));
+        updateStatusMutation({ id, status });
     };
 
     const updateProgress = (id: string, page: number) => {
-        setLibrary(prev => prev.map(book =>
-            book.id === id ? { ...book, userCurrentPage: page } : book
-        ));
+        updateProgressMutation({ id, page });
     };
 
     const rateBook = (id: string, rating: number, review?: string) => {
-        setLibrary(prev => prev.map(book =>
-            book.id === id ? { ...book, userRating: rating, review, status: 'COMPLETED' } : book
-        ));
+        rateBookMutation({ id, rating, review });
     };
 
     const removeBook = (id: string) => {
-        setLibrary(prev => prev.filter(b => b.id !== id));
+        removeBookMutation({ id });
     };
 
     const clearLibrary = () => {
-        setLibrary([]);
-        localStorage.removeItem('bookberry_library');
+        clearLibraryMutation({});
     };
 
     return (
