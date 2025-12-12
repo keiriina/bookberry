@@ -12,7 +12,6 @@ export default function ProfilePage() {
     const [sortBy, setSortBy] = useState<'date' | 'rating' | 'title'>('date');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [isSortOpen, setIsSortOpen] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const currentlyReading = library.filter(b => b.status === 'READING');
 
@@ -84,47 +83,22 @@ export default function ProfilePage() {
                 <section>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         {/* Filters (Left) */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                className="flex items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors w-[180px]"
-                            >
-                                <div className="flex items-center px-2 text-gray-400">
-                                    <Filter size={18} />
-                                </div>
-                                <span className="flex-1 text-left text-xs font-bold text-gray-600 truncate">
-                                    {activeFilter.replace(/_/g, ' ')}
-                                </span>
-                                <div className="px-2 text-gray-400">
-                                    <ChevronDown size={16} />
-                                </div>
-                            </button>
-
-                            {isFilterOpen && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-10"
-                                        onClick={() => setIsFilterOpen(false)}
-                                    />
-                                    <div className="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-                                        {['COMPLETED', 'READING', 'WANT_TO_READ'].map((status) => (
-                                            <button
-                                                key={status}
-                                                onClick={() => {
-                                                    setActiveFilter(status as any);
-                                                    setIsFilterOpen(false);
-                                                }}
-                                                className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-colors ${activeFilter === status
-                                                    ? 'text-[var(--color-primary-green)] bg-[var(--color-accent-pink)]/50'
-                                                    : 'text-gray-600 hover:bg-[var(--color-accent-pink)]/30'
-                                                    }`}
-                                            >
-                                                {status.replace(/_/g, ' ')}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
+                        <div className="flex flex-wrap gap-2 items-center bg-white p-2 rounded-xl shadow-sm">
+                            <div className="flex items-center px-2 text-gray-400">
+                                <Filter size={18} />
+                            </div>
+                            {['COMPLETED', 'READING', 'WANT_TO_READ'].map((status) => (
+                                <button
+                                    key={status}
+                                    onClick={() => setActiveFilter(status as any)}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeFilter === status
+                                        ? 'bg-[var(--color-primary-green)] text-white shadow-sm'
+                                        : 'hover:bg-gray-100 text-gray-500'
+                                        }`}
+                                >
+                                    {status.replace(/_/g, ' ')}
+                                </button>
+                            ))}
                         </div>
 
                         {/* Sort & View (Right) */}
