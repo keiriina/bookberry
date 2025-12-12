@@ -66,7 +66,7 @@ export default function ProfilePage() {
     if (!user) return null;
 
     return (
-        <main className="min-h-screen bg-[var(--color-accent-pink)] px-6 py-10">
+        <main className="min-h-screen bg-[var(--color-accent-pink)] px-8 py-12">
             <div className="max-w-5xl mx-auto space-y-12">
 
                 {/* Profile & Goal Header */}
@@ -164,7 +164,7 @@ export default function ProfilePage() {
                 {/* Library Header (Small) */}
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-gray-700 flex items-center gap-2">
-                        <span>📚</span> Your Collection
+                        Your Collection
                     </h2>
                     {library.length > 0 && (
                         <button

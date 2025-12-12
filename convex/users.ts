@@ -58,3 +58,13 @@ export const updateUsername = mutation({
         }
     },
 });
+
+export const getPublicProfile = query({
+    args: { userId: v.string() },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("users")
+            .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+            .first();
+    },
+});

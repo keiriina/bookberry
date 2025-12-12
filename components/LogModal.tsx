@@ -12,7 +12,7 @@ export function LogModal({ isOpen, onClose }: LogModalProps) {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Log a Book">
             <div className="max-h-[70vh] overflow-y-auto pr-2">
-                <BookSearch />
+                <BookSearch onBookClick={onClose} />
             </div>
         </Modal>
     );

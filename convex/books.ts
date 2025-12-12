@@ -31,6 +31,16 @@ export const get = query({
     },
 });
 
+export const getPublicBooks = query({
+    args: { userId: v.string() },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("books")
+            .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+            .collect();
+    },
+});
+
 export const add = mutation({
     args: {
         id: v.string(), // Google Books ID
@@ -143,5 +153,58 @@ export const clear = mutation({
         for (const book of books) {
             await ctx.db.delete(book._id);
         }
+    },
+});
+
+export const getUserBook = query({
+    args: { bookId: v.string() },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) return null;
+        const userId = identity.subject;
+
+        return await ctx.db
+            .query("books")
+            .withIndex("by_user_id", (q) => q.eq("userId", userId))
+            .filter((q) => q.eq(q.field("id"), args.bookId))
+            .first();
+    },
+});
+
+export const getReviews = query({
+    args: { bookId: v.string() },
+    handler: async (ctx, args) => {
+        const bookEntries = await ctx.db
+            .query("books")
+            .withIndex("by_google_id", (q) => q.eq("id", args.bookId))
+            .collect();
+
+        const reviews = bookEntries.filter((b) => b.userRating !== undefined || b.review);
+
+        const ratings = reviews.map((r) => r.userRating).filter((r): r is number => r !== undefined);
+        const averageRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+
+        const userIds = [...new Set(reviews.map((r) => r.userId))];
+        const users = await Promise.all(
+            userIds.map((uid) =>
+                ctx.db
+                    .query("users")
+                    .withIndex("by_user_id", (q) => q.eq("userId", uid))
+                    .unique()
+            )
+        );
+
+        const userMap = new Map(users.map((u) => [u?.userId, u]));
+
+        const reviewsWithUser = reviews.map((r) => ({
+            ...r,
+            user: userMap.get(r.userId),
+        }));
+
+        return {
+            averageRating,
+            totalRatings: ratings.length,
+            reviews: reviewsWithUser,
+        };
     },
 });
