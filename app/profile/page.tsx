@@ -13,8 +13,6 @@ export default function ProfilePage() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [isSortOpen, setIsSortOpen] = useState(false);
 
-    const currentlyReading = library.filter(b => b.status === 'READING');
-
     const filteredLibrary = useMemo(() => {
         let books = library.filter(b => b.status === activeFilter);
 
@@ -64,20 +62,7 @@ export default function ProfilePage() {
                     )}
                 </div>
 
-                {/* Currently Reading */}
-                {currentlyReading.length > 0 && (
-                    <section>
-                        <h2 className="text-2xl font-bold text-[var(--color-primary-pink)] mb-6 flex items-center gap-2">
-                            <span className="w-2 h-8 rounded-full bg-[var(--color-primary-pink)] block"></span>
-                            Currently Reading
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                            {currentlyReading.map(book => (
-                                <BookCard key={book.id} book={book} isLibraryMode />
-                            ))}
-                        </div>
-                    </section>
-                )}
+
 
                 {/* Library List */}
                 <section>

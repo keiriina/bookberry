@@ -48,13 +48,13 @@ export function BookSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search by title, author, or ISBN..."
-                    className="w-full pl-12 pr-6 py-4 rounded-full border-2 border-[var(--color-primary-pink)]/30 focus:border-[var(--color-primary-pink)] focus:ring-4 focus:ring-[var(--color-accent-pink)] outline-none text-lg shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-3 rounded-full border border-[var(--color-primary-pink)]/30 focus:border-[var(--color-primary-pink)] focus:ring-4 focus:ring-[var(--color-accent-pink)] outline-none md:text-md text-sm shadow-sm transition-all"
                 />
-                <Search className="absolute left-4 text-[var(--color-text-muted)]" size={24} />
+                <Search className="absolute left-3.5 text-[var(--color-text-muted)]" size={20} />
                 <button
                     type="submit"
                     disabled={loading}
-                    className="absolute right-2 bg-[var(--color-primary-pink)] text-white px-6 py-2 rounded-full font-bold hover:bg-[var(--color-secondary-pink)] hover:text-[var(--color-primary-pink)] disabled:opacity-50 transition-colors"
+                    className="absolute right-1.5 bg-[var(--color-primary-pink)] text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-[var(--color-secondary-pink)] hover:text-[var(--color-primary-pink)] disabled:opacity-50 transition-colors"
                 >
                     {loading ? 'Searching...' : 'Search'}
                 </button>

@@ -18,3 +18,14 @@ body {
   color: var(--color-text-main);
   font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Hide number input spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}

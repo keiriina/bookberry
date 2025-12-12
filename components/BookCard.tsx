@@ -172,39 +172,61 @@ export function BookCard({ book, isLibraryMode = false, viewMode = 'list' }: Boo
                         )}
 
                         {isLibraryMode && userBook?.status === 'READING' && (
-                            <div className="mt-2 text-sm">
-                                <div className="flex justify-between text-xs text-[var(--color-text-muted)] mb-1">
-                                    <span>Page {userBook.userCurrentPage || 0} {book.pageCount > 0 && `of ${book.pageCount}`}</span>
+                            <div className="mt-3 space-y-2">
+                                <div className="flex justify-between items-end text-xs font-bold text-[var(--color-text-muted)] px-1">
+                                    <span>
+                                        Page <span className="text-[var(--color-text-main)]">{userBook.userCurrentPage || 0}</span>
+                                        <span className="font-normal text-gray-400"> of {book.pageCount}</span>
+                                    </span>
+                                    <span className="text-[var(--color-primary-pink)] bg-[var(--color-accent-pink)] px-2 py-0.5 rounded-full text-[10px]">
+                                        {Math.round(((userBook.userCurrentPage || 0) / (book.pageCount || 1)) * 100)}%
+                                    </span>
                                 </div>
-                                <ProgressBar current={userBook.userCurrentPage || 0} total={book.pageCount} />
 
-                                {/* Enhanced Progress Input */}
-                                <div className="mt-3 flex items-center gap-2">
-                                    {isEditingProgress ? (
-                                        <div className="flex items-center gap-2 animate-in fade-in zoom-in duration-200">
-                                            <span className="text-xs text-[var(--color-text-muted)] font-bold">Pg</span>
-                                            <input
-                                                type="number"
-                                                value={pageInput}
-                                                onChange={(e) => setPageInput(Number(e.target.value))}
-                                                className="w-16 h-8 text-sm px-2 border-2 border-[var(--color-primary-green)]/50 rounded-lg outline-none focus:border-[var(--color-primary-green)] text-center font-bold"
-                                                autoFocus
-                                            />
-                                            <button
-                                                onClick={handleSaveProgress}
-                                                className="w-8 h-8 flex items-center justify-center bg-[var(--color-primary-green)] text-white rounded-lg hover:opacity-90 shadow-sm"
-                                            >
-                                                <Save size={14} />
-                                            </button>
-                                        </div>
-                                    ) : (
+                                <div className="flex items-center gap-3">
+                                    <div className="flex-1 min-w-0">
+                                        <ProgressBar current={userBook.userCurrentPage || 0} total={book.pageCount} showLabel={false} />
+                                    </div>
+
+                                    <div className="flex items-center bg-[var(--color-bg-secondary)] rounded-full p-1 shadow-inner border border-transparent hover:border-[var(--color-secondary-pink)] transition-colors flex-shrink-0">
                                         <button
-                                            onClick={() => setIsEditingProgress(true)}
-                                            className="text-xs font-bold text-[var(--color-text-muted)] hover:text-[var(--color-primary-pink)] underline decoration-dashed underline-offset-4 transition-colors"
+                                            onClick={() => updateProgress(book.id, Math.max(0, (userBook.userCurrentPage || 0) - 1))}
+                                            className="w-7 h-7 flex items-center justify-center rounded-full text-[var(--color-text-muted)] hover:bg-white hover:shadow-sm hover:text-[var(--color-primary-pink)] transition-all flex-shrink-0"
                                         >
-                                            Update Progress
+                                            -
                                         </button>
-                                    )}
+                                        <form
+                                            onSubmit={(e) => {
+                                                e.preventDefault();
+                                                if (pageInput !== (userBook.userCurrentPage || 0)) {
+                                                    handleSaveProgress();
+                                                }
+                                            }}
+                                            className="w-14 mx-1"
+                                        >
+                                            <div className="relative">
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    max={book.pageCount}
+                                                    value={pageInput}
+                                                    onChange={(e) => setPageInput(Number(e.target.value))}
+                                                    onBlur={() => {
+                                                        if (pageInput !== (userBook.userCurrentPage || 0)) {
+                                                            handleSaveProgress();
+                                                        }
+                                                    }}
+                                                    className="w-full text-center text-sm font-bold bg-transparent border-none outline-none text-[var(--color-text-main)] p-0 focus:ring-0"
+                                                />
+                                            </div>
+                                        </form>
+                                        <button
+                                            onClick={() => updateProgress(book.id, Math.min(book.pageCount, (userBook.userCurrentPage || 0) + 1))}
+                                            className="w-7 h-7 flex items-center justify-center rounded-full text-[var(--color-text-muted)] hover:bg-white hover:shadow-sm hover:text-[var(--color-primary-pink)] transition-all flex-shrink-0"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -232,39 +254,18 @@ export function BookCard({ book, isLibraryMode = false, viewMode = 'list' }: Boo
                                 onClick={() => !isAdding && setShowAddModal(true)}
                                 disabled={isAdding}
                                 className={clsx(
-                                    "px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 transform active:scale-95",
+                                    "px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all duration-300 transform active:scale-95 shadow-sm",
                                     isAdding
                                         ? "bg-[var(--color-primary-green)] text-white"
-                                        : "bg-[var(--color-primary-pink)] hover:bg-[var(--color-secondary-pink)] text-white"
+                                        : "bg-[var(--color-accent-pink)] text-[var(--color-primary-pink)] border border-[var(--color-primary-pink)] hover:bg-[var(--color-primary-pink)] hover:text-white"
                                 )}
                             >
-                                {isAdding ? <Check size={16} /> : <Plus size={16} />}
-                                <span>{isAdding ? 'Added!' : 'Add to Shelf'}</span>
+                                {isAdding ? <Check size={14} /> : <Plus size={14} />}
+                                <span>{isAdding ? 'Added' : 'Add'}</span>
                             </button>
                         ) : (
                             <div className="flex gap-2 items-center">
-                                <select
-                                    value={userBook?.status}
-                                    onChange={(e) => updateBookStatus(book.id, e.target.value as ReadingStatus)}
-                                    className="text-xs font-bold bg-[var(--color-accent-pink)] border-2 border-[var(--color-secondary-pink)] text-[var(--color-primary-pink)] rounded-xl px-3 py-1.5 outline-none focus:border-[var(--color-primary-green)] focus:text-[var(--color-primary-green)] transition-all cursor-pointer hover:border-[var(--color-primary-pink)]"
-                                >
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="READING">Reading</option>
-                                    <option value="WANT_TO_READ">Want to Read</option>
-                                </select>
-                                <button
-                                    onClick={() => {
-                                        if (confirm('Remove this book from your shelf?')) {
-                                            removeBook(book.id);
-                                            addToast('Book removed from shelf.', 'info');
-                                        }
-                                    }}
-                                    className="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-full transition-all"
-                                    title="Remove from Shelf"
-                                >
-                                    <span className="sr-only">Remove</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
-                                </button>
+                                {/* Status controlled via Log or Progress */}
                             </div>
                         )}
                     </div>

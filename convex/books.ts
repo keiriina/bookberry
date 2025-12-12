@@ -57,8 +57,9 @@ export const add = mutation({
             .first();
 
         if (existing) {
-            // If it exists, maybe just update status if different? 
-            // For now, allow re-adding to just return success or do nothing.
+            // Update status if it's different and being re-added/logged
+            // This handles moving between "shelves"
+            await ctx.db.patch(existing._id, { status: args.status });
             return existing._id;
         }
 
@@ -86,7 +87,19 @@ export const updateProgress = mutation({
     handler: async (ctx, args) => {
         const book = await getBookForUser(ctx, args.id);
         if (book) {
-            await ctx.db.patch(book._id, { userCurrentPage: args.page });
+            const updates: any = { userCurrentPage: args.page };
+
+            // Auto-complete if finished
+            if (args.page >= book.pageCount && book.pageCount > 0) {
+                updates.status = "COMPLETED";
+            } else if (args.page < book.pageCount && book.status === "COMPLETED") {
+                // Optional: Revert to READING if page < total?
+                // User didn't ask for this explicitly, but it makes sense.
+                // Sticking to explicit request: "If reading reached n/n ... put in completed".
+                // I won't auto-revert to avoid annoyance unless explicitly asked.
+            }
+
+            await ctx.db.patch(book._id, updates);
         }
     },
 });

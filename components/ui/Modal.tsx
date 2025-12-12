@@ -40,7 +40,7 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
             />
 
             {/* Modal Card */}
-            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border-4 border-[var(--color-secondary-pink)]">
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border-4 border-[var(--color-secondary-pink)]">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-[var(--color-secondary-pink)] bg-[var(--color-accent-pink)]">
                     <h2 className="text-xl font-black text-gray-800 line-clamp-1">{title}</h2>

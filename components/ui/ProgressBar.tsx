@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function ProgressBar({ current, total }: { current: number, total: number }) {
+export function ProgressBar({ current, total, showLabel = true }: { current: number, total: number, showLabel?: boolean }) {
     // Prevent division by zero and ensure valid number
     const safeTotal = total > 0 ? total : 1;
     const rawPercentage = (current / safeTotal) * 100;
@@ -18,7 +18,9 @@ export function ProgressBar({ current, total }: { current: number, total: number
                     style={{ width: total > 0 ? `${percentage}%` : '0%' }}
                 />
             </div>
-            <span className="text-xs font-bold text-[var(--color-primary-green)] w-8 text-right">{displayPercentage}</span>
+            {showLabel && (
+                <span className="text-xs font-bold text-[var(--color-primary-green)] w-8 text-right">{displayPercentage}</span>
+            )}
         </div>
     );
 }
